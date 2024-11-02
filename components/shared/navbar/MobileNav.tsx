@@ -5,9 +5,6 @@ import {
   Sheet,
   SheetContent,
   SheetClose,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
 import Image from 'next/image'
@@ -74,7 +71,7 @@ const MobileNav = () => {
             <Navcontent />
           </SheetClose>
 
-          <SignedOut>
+          {/* <SignedOut> */}
             <div className='flex flex-col gap-3'>
             <SheetClose asChild>
               <Link href="/sign-in">
@@ -92,7 +89,7 @@ const MobileNav = () => {
               </Link>
             </SheetClose>
             </div>
-          </SignedOut>
+          {/* </SignedOut> */}
         </div>
       </SheetContent>
     </Sheet>
