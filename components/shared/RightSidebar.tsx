@@ -5,20 +5,20 @@ import RenderTags from './RenderTags'
 
 const RightSidebar = () => {
   const hotQuestions = [
-    {_id: 1, title: 'How to create a custom hook in React?'},
-    {_id: 2, title: 'What are the benefits and trade-offs of using Server-Side Rendering (SSR) in Next.js?'},
-    {_id: 3, title: 'ReactJs or NextJs for begginers i ask for advice'},
-    {_id: 4, title: 'Node.js res.json() and res.send(), not working but still able to change status code'},
-    {_id: 5, title: 'How to Ensure Unique User Profile with ON CONFLICT'},
+    {_id: '1', title: 'How to create a custom hook in React?'},
+    {_id: '2', title: 'What are the benefits and trade-offs of using Server-Side Rendering (SSR) in Next.js?'},
+    {_id: '3', title: 'ReactJs or NextJs for begginers i ask for advice'},
+    {_id: '4', title: 'Node.js res.json() and res.send(), not working but still able to change status code'},
+    {_id: '5', title: 'How to Ensure Unique User Profile with ON CONFLICT'},
   ]
 
 
   const popularTags = [
-    { _id:1, name: 'javascript', totalQuestions: 5,},
-    { _id:1, name: 'typescript', totalQuestions: 4,},
-    { _id:1, name: 'solidity', totalQuestions: 2,},
-    { _id:1, name: 'react', totalQuestions: 5,},
-    { _id:1, name: 'redux', totalQuestions: 5,}
+    { _id:'1', name: 'javascript', totalQuestions: 5,},
+    { _id:'1', name: 'typescript', totalQuestions: 4,},
+    { _id:'1', name: 'solidity', totalQuestions: 2,},
+    { _id:'1', name: 'react', totalQuestions: 5,},
+    { _id:'1', name: 'redux', totalQuestions: 5,}
   ]
 
   return (
