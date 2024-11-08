@@ -5,34 +5,13 @@ import NoResult from '@/components/shared/NoResult'
 import LocalSearchbar from '@/components/shared/search/LocalSearchbar'
 import { Button } from '@/components/ui/button'
 import { HomePageFilters } from '@/constants/filter'
+import { getQuestions } from '@/lib/actions/question.action'
 import Link from 'next/link'
 import React from 'react'
 
-
-const questions = [
-  {
-    _id: '1',
-    title: 'What is the best way to learn React?',
-    tags: [{ _id: '1', name: 'React' }, { _id: '2', name: 'JavaScript' }],
-    author: { _id: '1', name: 'John Doe ', picture: 'https://example.com/john.jpg' },
-    upvotes: 1000000,
-    views: 150000,
-    answers: [{ content: 'Practice every day' }, { content: 'Build small projects' }],
-    createdAt: new Date('2024-09-01T00:00:00.000Z')
-  },
-  {
-    _id: '2',
-    title: 'How to get started with TypeScript?',
-    tags: [{ _id: '3', name: 'TypeScript' }, { _id: '4', name: 'JavaScript' }],
-    author: { _id: '2', name: 'Maria Doe', picture: 'https://example.com/maria.jpg' },
-    upvotes: 5,
-    views: 200,
-    answers: [{ content: 'Start by learning the basics of types' }, { content: 'Follow documentation examples' }],
-    createdAt: new Date('2024-09-02T00:00:00.000Z')
-  }
-];
-
-const Home = () => {
+const Home = async () => {
+  const result = await getQuestions({});
+  
   return (
     <>
       <div className='flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center'>
@@ -64,8 +43,8 @@ const Home = () => {
 
       <div className='mt-10 flex w-full flex-col gap-6'>
         {/* looping through questions */}
-        { questions.length > 0 ?
-          questions.map((question) => (
+        { result.questions.length > 0 ?
+          result.questions.map((question) => (
              <QuestionCard
               key={question._id}
               _id={question._id}
