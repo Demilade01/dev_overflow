@@ -19,13 +19,20 @@ import { QuestionsSchema } from "@/lib/validation"
 import { z } from "zod"
 import { Badge } from '../ui/badge';
 import Image from 'next/image';
+import { createQuestion } from '@/lib/actions/question.action';
+import { usePathname, useRouter } from 'next/navigation';
 
 const type:any = 'create'
 
+interface Props {
+  mongoUserId: string;
+}
 
-const Questions = () => {
+const Questions = ({ mongoUserId }: Props) => {
   const editorRef = useRef(null);
   const [isSubmitting, setisSubmitting] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const form = useForm<z.infer<typeof QuestionsSchema>>({
     resolver: zodResolver(QuestionsSchema),
@@ -37,14 +44,22 @@ const Questions = () => {
   })
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof QuestionsSchema>) {
+  async function onSubmit(values: z.infer<typeof QuestionsSchema>) {
     setisSubmitting(true);
 
     try {
       // make an async call to your API -> to create a question
-      // contain all form data
+      // contain  all form data
+      await createQuestion({
+        title: values.title,
+        content: values.explanation,
+        tags: values.tags,
+        author: JSON.parse(mongoUserId),
+        path: pathname,
+      });
 
       // navigate to home page
+      router.push('/');
     } catch (error) {
 
     } finally {
@@ -120,6 +135,8 @@ const Questions = () => {
                     // @ts-ignore
                     editorRef.current = editor
                   }}
+                  onBlur={field.onBlur}
+                  onEditorChange={(content) => field.onChange(content)}
                   initialValue=""
                   init={{
                     height: 350,
