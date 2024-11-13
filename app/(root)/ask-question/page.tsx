@@ -4,16 +4,12 @@ import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation';
 import React from 'react'
 
-const page = async () => {
-  // const { userId } = await auth();
-  const userId = "clerk12345"
+const Page = async () => {
+  const { userId } = await auth();
 
   if(!userId) redirect('/sign-in');
 
   const mongoUser = await getUserById({ userId });
-
-  console.log(mongoUser);
-
 
   return (
     <div>
@@ -25,4 +21,4 @@ const page = async () => {
   )
 }
 
-export default page
+export default Page
