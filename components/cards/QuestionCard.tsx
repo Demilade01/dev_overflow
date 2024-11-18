@@ -68,7 +68,7 @@ const QuestionCard = ({
         <Metric
           imgUrl="/assets/icons/message.svg"
           alt="Upvotes"
-          value={answers.length}
+          value={formatLargeNumber(answers.length)}
           title="Answers"
           textStyles="small-medium text-dark400_light800"
         />
