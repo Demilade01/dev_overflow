@@ -12,7 +12,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
-const Page = async ({ params }) => {
+const Page = async ({ params }: any) => {
   const result = await getQuestionById({ questionId: params.id });
   const { userId: clerkId} = await auth();
 
