@@ -54,3 +54,17 @@ export const formatLargeNumber = (num: number): string => {
   return num.toString();
 };
 
+export const getJoinedDate = ( date : string): string => {
+  const parsedDate = new Date(date);
+
+  // Check for invalid date
+  if (isNaN(parsedDate.getTime())) {
+    throw new Error("Invalid date format. Ensure the date is in 'YYYY-MM-DD' format.");
+  }
+
+  const month = parsedDate.toLocaleString('default', { month: 'long' }); // Full month name
+  const year = parsedDate.getFullYear();
+
+  return `${month} ${year}`;
+}
+

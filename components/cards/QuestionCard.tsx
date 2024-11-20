@@ -5,17 +5,19 @@ import Metric from '../shared/Metric';
 import { formatLargeNumber, getTimestamp } from '@/lib/utils';
 
 interface Props {
+  clerkId?: string;
   _id: string;
   title: string;
   tags: { _id: string, name: string }[];
   author:  { _id: string, name: string, picture: string };
-  upvotes: number;
+  upvotes: string[];
   views: number;
   answers: Array<object>;
   createdAt: Date;
 }
 
 const QuestionCard = ({
+  clerkId,
   _id,
   title,
   tags,
@@ -26,7 +28,7 @@ const QuestionCard = ({
   createdAt
 }: Props) => {
   return (
-    <div className='card-wrapper p-9 sm:px-11 rounded-[10px]'>
+    <div className='card-wrapper p-9 sm:px-11 rounded-[10px] mt-5'>
       <div className='flex flex-col-reverse items-start justify-between gap-5 sm:flex-row'>
         <div>
           <span className='subtle-regular text-dark-400_light700 line-clamp-1 flex sm:hidden'>
@@ -61,7 +63,7 @@ const QuestionCard = ({
         <Metric
           imgUrl="/assets/icons/like.svg"
           alt="Upvotes"
-          value={formatLargeNumber(upvotes)}
+          value={formatLargeNumber(upvotes.length)}
           title="Votes"
           textStyles="small-medium text-dark400_light800"
         />
