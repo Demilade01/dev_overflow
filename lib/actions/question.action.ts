@@ -187,3 +187,28 @@ export async function EditQuestion(params: EditQuestionParams) {
     throw Error;
   }
 }
+
+export async function getHotQuestions() {
+  try {
+    connectToDatabase();
+
+    const hotQuestions = await Question.find({})
+      .sort({ views: -1, upvotes: -1 }) // descending order
+      .limit(5);
+
+      return hotQuestions;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+// export async function getAllUsers(params: GetAllUsersParams) {
+//   try {
+//     connectToDatabase();
+
+//   } catch (error) {
+//     console.log(error);
+//     throw error;
+//   }
+// }

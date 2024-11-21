@@ -22,7 +22,6 @@ import Image from 'next/image';
 import { createQuestion, EditQuestion } from '@/lib/actions/question.action';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTheme } from '@/context/ThemeProvider';
-import { parse } from 'path';
 
 interface Props {
   type?: string;
@@ -37,7 +36,7 @@ const Questions = ({ type, mongoUserId, questionDetails }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const parsedQuestionDetails = JSON.parse(questionDetails || "");
+  const parsedQuestionDetails = JSON.parse(questionDetails || "{}");
 
   const groupedTags = parsedQuestionDetails.tags?.map((tag: any) => tag.name);
 
