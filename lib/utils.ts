@@ -1,5 +1,16 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import qs from 'query-string'
+interface UrlQueryParams {
+  params: string;
+  key: string;
+  value: string;
+}
+
+interface RemoveUrlQueryParams {
+  params: string;
+  key: string[]
+}
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -68,3 +79,30 @@ export const getJoinedDate = ( date : string): string => {
   return `${month} ${year}`;
 }
 
+export const formUrlQuery = ({ params, key, value }: UrlQueryParams) => {
+  const currentUrl = qs.parse(params);
+
+  currentUrl[key] = value;
+
+  return qs.stringifyUrl({
+    url: window.location.pathname,
+    query: currentUrl,
+  },
+  { skipNull: true}
+)
+}
+
+export const removeKeyFromQuery = ({ params, key }: RemoveUrlQueryParams) => {
+  const currentUrl = qs.parse(params);
+
+  key.forEach((key) => {
+    delete currentUrl[key];
+  });
+
+  return qs.stringifyUrl({
+    url: window.location.pathname,
+    query: currentUrl,
+  },
+  { skipNull: true}
+)
+}
