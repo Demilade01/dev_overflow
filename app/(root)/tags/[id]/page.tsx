@@ -1,7 +1,19 @@
 import QuestionCard from '@/components/cards/QuestionCard';
 import NoResult from '@/components/shared/NoResult';
 import LocalSearchbar from '@/components/shared/search/LocalSearchbar';
-import { IQuestion } from '@/database/question.model';
+
+interface IQuestion {
+  _id: string;
+  title: string;
+  tags: { _id: string, name: string }[];
+  author: { _id: string; name: string; picture: string };
+  upvotes: string[];
+  views: number;
+  answers: Array<object>;
+  createdAt: Date;
+}
+
+
 import { getQuestionsByTagId } from '@/lib/actions/tag.actions';
 import { URLProps } from '@/types';
 import React from 'react'
@@ -19,7 +31,7 @@ const Page = async ({ params, searchParams }: URLProps) => {
 
       <div className='mt-11 w-full'>
         <LocalSearchbar
-          route='/'
+          route={`/tags/${params.id}`}
           iconPosition='left'
           imgSrc='/assets/icons/search.svg'
           placeholder='Search tag questions'
