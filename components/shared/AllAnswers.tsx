@@ -9,13 +9,14 @@ import Votes from "@/components/shared/Votes";
 import { getTimestamp } from "@/lib/utils";
 import { AnswerFilters } from "@/constants/filter";
 import { getAnswer } from "@/lib/actions/answer.action";
+import Pagination from "./Pagination";
 
 interface Props {
   questionId: string;
   userId: string;
   totalAnswers: number;
   page?: number;
-  filter?: number;
+  filter?: string;
 }
 
 const AllAnswers = async ({
@@ -27,6 +28,8 @@ const AllAnswers = async ({
 }: Props) => {
   const result = await getAnswer({
     questionId,
+    page: page ? +page: 1,
+    sortBy: filter,
   });
 
   return (
@@ -92,7 +95,10 @@ const AllAnswers = async ({
       </div>
 
       <div className="mt-10 w-full">
-        {/* <Pagination pageNumber={page ? +page : 1} isNext={result.isNext} /> */}
+        <Pagination
+          pageNumber={ page ? +page: 1}
+          isNext={result.isNextAnswer}
+        />
       </div>
     </div>
   );
