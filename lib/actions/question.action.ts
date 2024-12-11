@@ -3,7 +3,7 @@
 import Question from "@/database/question.model";
 import { connectToDatabase } from "../mongoose"
 import Tag from "@/database/tag.model";
-import { CreateQuestionParams, DeleteQuestionParams, EditQuestionParams, GetQuestionByIdParams, GetQuestionsParams, QuestionVoteParams } from "./shared.types";
+import { CreateQuestionParams, DeleteQuestionParams, EditQuestionParams, GetQuestionByIdParams, GetQuestionsParams, QuestionVoteParams, RecommendedParams } from "./shared.types";
 import User from "@/database/user.model";
 import { revalidatePath } from "next/cache";
 import Interaction from "@/database/interaction.model";
@@ -266,6 +266,74 @@ export async function getHotQuestions() {
       return hotQuestions;
   } catch (error) {
     console.log(error);
+    throw error;
+  }
+}
+
+export async function getRecommendedQuestions(params: RecommendedParams) {
+  try {
+    await connectToDatabase();
+
+    const { userId, page = 1, pageSize = 20, searchQuery } = params;
+
+    const user = await User.findOne({ clerkId: userId });
+
+    if(!user) {
+      throw new Error("user not found");
+    }
+
+    const skipAmount = (page - 1) * pageSize;
+
+    const userInteractions = await Interaction.find({ user: user._id })
+      .populate("tags")
+      .exec();
+
+    const userTags = userInteractions.reduce((tags, interaction) => {
+      if (interaction.tags) {
+        tags = tags.concat(interaction.tags);
+      }
+      return tags;
+    }, []);
+
+    // Get distinct tagId from user Interactions
+    const distinctUserTagIDs = [
+      // @ts-ignore
+      ...new Set(userTags.map((tag: any) => tag._id))
+    ];
+
+    const query: FilterQuery<typeof Question> = {
+      $and: [
+        { tags: { $in: distinctUserTagIDs }},
+        { author: { $ne: user.Id }},
+      ],
+    };
+
+    if(searchQuery) {
+      query.$or = [
+        { title: { $regex: searchQuery, $options: "i" }},
+        { content: { $regex: searchQuery, $options: "i" }}
+      ]
+    }
+
+    const totalQuestions = await Question.countDocuments(query);
+
+    const recommendQuestions = await Question.find(query)
+      .populate({
+        path: "tags",
+        model: Tag,
+      })
+      .populate({
+        path: "author",
+        model: User,
+      })
+      .skip(skipAmount)
+      .limit(pageSize);
+
+    const isNext = totalQuestions > skipAmount + recommendQuestions.length;
+
+    return { questions: recommendQuestions, isNext }
+  } catch (error) {
+    console.log("Error getting recommended questions:", error);
     throw error;
   }
 }

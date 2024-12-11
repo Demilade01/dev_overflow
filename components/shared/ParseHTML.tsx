@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect } from 'react'
-
+// @ts-ignore
 import Prism from 'prismjs'
 import parse from 'html-react-parser'
 
@@ -39,7 +39,7 @@ const ParseHTML = ({ data }: Props) => {
 
 
   return (
-    <div>
+    <div className={`markdown w-full min-w-full`}>
       {parse(data)}
     </div>
   )

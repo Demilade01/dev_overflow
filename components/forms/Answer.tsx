@@ -22,6 +22,7 @@ interface Props {
 const Answer = ({ question, questionId, authorId }: Props) => {
   const pathname = usePathname();
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [IsSubmittingAI, setIsSubmittingAI] = useState(false)
   const { mode } = useTheme();
   const editorRef = React.useRef(null)
   const form = useForm<z.infer<typeof AnswersSchema>>({
@@ -57,6 +58,57 @@ const Answer = ({ question, questionId, authorId }: Props) => {
     }
   }
 
+  const generateAIAnswer = async () => {
+    if (!authorId) return;
+
+    setIsSubmittingAI(true);
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/openai`, // Fixed URL
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ question }),
+        }
+      );
+
+      if (!response.ok) {
+        console.error("Failed to fetch AI answer:", response.statusText);
+        throw new Error("Failed to fetch AI answer");
+      }
+
+      const aiAnswer = await response.json();
+
+      if (!aiAnswer || aiAnswer.error) {
+        console.warn(
+          "AI response error:",
+          aiAnswer?.error || "No response received from server."
+        );
+
+        const fallbackMessage =
+          "Sorry, I could not provide an answer to your question. Please try again.";
+        if (editorRef.current) {
+          (editorRef.current as any).setContent(fallbackMessage);
+        }
+        return;
+      }
+
+      const formattedAiAnswer = aiAnswer.reply.replace(/\n/g, "<br />");
+
+      if (editorRef.current) {
+        const editor = editorRef.current as any;
+        editor.setContent(formattedAiAnswer);
+      }
+    } catch (error: any) {
+      console.error("Error generating AI answer:", error.message);
+    } finally {
+      setIsSubmittingAI(false);
+    }
+  };
+
   return (
     <div>
       <div className='flex flex-col justify-between gap-6 sm:flex-row sm:items-center sm:gap-2'>
@@ -64,16 +116,24 @@ const Answer = ({ question, questionId, authorId }: Props) => {
 
         <Button
           className='btn lght-border-2 gap-1.5 rounded-md px-4 py-2.5 text-primary-500 shadow-none dark:text-primary-500'
-          onClick={() => {}}
+          onClick={generateAIAnswer}
         >
-          <Image
-            src='/assets/icons/stars.svg'
-            alt="stars"
-            width={12}
-            height={12}
-            className='object-contain'
-          />
-          Generate an AI Answer
+          {IsSubmittingAI ? (
+            <>
+              Generating..
+            </>
+          ) : (
+            <>
+              <Image
+                src='/assets/icons/stars.svg'
+                alt="stars"
+                width={12}
+                height={12}
+                className='object-contain'
+                />
+                Generate AI Answer
+            </>
+          )}
         </Button>
       </div>
 
