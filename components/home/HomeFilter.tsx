@@ -1,7 +1,7 @@
 "use client"
 
 import { HomePageFilters } from '@/constants/filter'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Button } from '../ui/button'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { formUrlQuery } from '@/lib/utils'
@@ -47,4 +47,4 @@ const HomeFilter = () => {
   )
 }
 
-export default HomeFilter  
+export default HomeFilter
