@@ -3,21 +3,63 @@
 import Question from "@/database/question.model";
 import { connectToDatabase } from "../mongoose"
 import Tag from "@/database/tag.model";
-import { CreateQuestionParams, DeleteQuestionParams, EditQuestionParams, GetQuestionByIdParams, GetQuestionsParams, QuestionVoteParams } from "./shared.types";
+import { CreateQuestionParams, DeleteQuestionParams, EditQuestionParams, GetQuestionByIdParams, GetQuestionsParams, QuestionVoteParams, RecommendedParams } from "./shared.types";
 import User from "@/database/user.model";
 import { revalidatePath } from "next/cache";
 import Interaction from "@/database/interaction.model";
 import Answer from "@/database/answer.model";
+import { FilterQuery } from "mongoose";
 
 export async function getQuestions(params: GetQuestionsParams) {
   try {
     connectToDatabase();
 
-    const questions = await Question.find({})
+    const { searchQuery, filter, page = 1, pageSize = 10 } = params;
+
+    // calculate the number of posts to skip based on the page number and page size
+
+    const skipAmount = (page - 1) * pageSize;
+
+    const query: FilterQuery<typeof Question> = {};
+
+    if(searchQuery) {
+      query.$or = [
+        { title: { $regex: new RegExp(searchQuery, 'i')}},
+        { content: { $regex: new RegExp(searchQuery, 'i')}}
+      ]
+    }
+
+    let sortOptions = {};
+
+    switch (filter) {
+      case "newest":
+        sortOptions = { createdAt: -1 }
+        break;
+      case "recommended":
+        sortOptions = { upvotes: -1 }
+        break;
+      case "frequent":
+        sortOptions = { views: -1 }
+        break;
+      case "unaswered":
+        query.answers = { $size: 0 }
+        break;
+      default:
+        break;
+    }
+
+    const questions = await Question.find(query)
       .populate({ path: 'tags', model: Tag  })
       .populate({ path: 'author', model: User })
-      .sort({ createdAt: -1   })
-    return { questions }
+      .skip(skipAmount)
+      .limit(pageSize)
+      .sort(sortOptions);
+
+    const totalQuestions = await Question.countDocuments(query);
+
+    const isNext = totalQuestions > skipAmount + questions.length;
+
+    return { questions, isNext }
   } catch (error) {
     console.log(error);
     throw error;
@@ -51,10 +93,19 @@ export async function createQuestion(params: CreateQuestionParams) {
     await Question.findByIdAndUpdate(question._id, { $push: {tags: { $each: tagDocuments}} });
 
     // Create an interaction for the user ask_question action
+    await Interaction.create({
+      user: author,
+      action: "ask_question",
+      question: question._id,
+      tags: tagDocuments,
+    })
 
     // Increment AUTHOR'S REPUTATION by +5 points for creating a question
+    await User.findByIdAndUpdate(author, { $inc: { reputation: 5 }})
+
     revalidatePath(path);
   } catch (error) {
+    console.log(error);
 
   }
 }
@@ -101,7 +152,15 @@ export async function upvoteQuestion(params: QuestionVoteParams) {
       throw new Error('Question not found');
     }
 
-    // Increment author's reputation
+    // Increment author's reputation by +1/-1 by upvoting/revoking an upvote to the question
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasupVoted   ? -1 : 1}
+    })
+
+    // Increment author's reputation by +10/-10 for recieving an upvote/downvote  to the question
+    await User.findByIdAndUpdate(question.author, {
+      $inc: { reputation: hasupVoted ? -10 : 10 }
+    })
 
     revalidatePath(path);
 
@@ -137,6 +196,14 @@ export async function downvoteQuestion(params: QuestionVoteParams) {
     }
 
     // Increment author's reputation
+    await User.findByIdAndUpdate(userId,
+      { $inc : { reputation:  hasdownVoted ? -2 : 2 }
+    })
+
+    await User.findByIdAndUpdate(question.author,
+      { $inc : { reputation:  hasdownVoted ? -10 : 10 }
+    })
+
 
     revalidatePath(path);
 
@@ -187,3 +254,96 @@ export async function EditQuestion(params: EditQuestionParams) {
     throw Error;
   }
 }
+
+export async function getHotQuestions() {
+  try {
+    connectToDatabase();
+
+    const hotQuestions = await Question.find({})
+      .sort({ views: -1, upvotes: -1 }) // descending order
+      .limit(5);
+
+      return hotQuestions;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export async function getRecommendedQuestions(params: RecommendedParams) {
+  try {
+    await connectToDatabase();
+
+    const { userId, page = 1, pageSize = 20, searchQuery } = params;
+
+    const user = await User.findOne({ clerkId: userId });
+
+    if(!user) {
+      throw new Error("user not found");
+    }
+
+    const skipAmount = (page - 1) * pageSize;
+
+    const userInteractions = await Interaction.find({ user: user._id })
+      .populate("tags")
+      .exec();
+
+    const userTags = userInteractions.reduce((tags, interaction) => {
+      if (interaction.tags) {
+        tags = tags.concat(interaction.tags);
+      }
+      return tags;
+    }, []);
+
+    // Get distinct tagId from user Interactions
+    const distinctUserTagIDs = [
+      // @ts-ignore
+      ...new Set(userTags.map((tag: any) => tag._id))
+    ];
+
+    const query: FilterQuery<typeof Question> = {
+      $and: [
+        { tags: { $in: distinctUserTagIDs }},
+        { author: { $ne: user.Id }},
+      ],
+    };
+
+    if(searchQuery) {
+      query.$or = [
+        { title: { $regex: searchQuery, $options: "i" }},
+        { content: { $regex: searchQuery, $options: "i" }}
+      ]
+    }
+
+    const totalQuestions = await Question.countDocuments(query);
+
+    const recommendQuestions = await Question.find(query)
+      .populate({
+        path: "tags",
+        model: Tag,
+      })
+      .populate({
+        path: "author",
+        model: User,
+      })
+      .skip(skipAmount)
+      .limit(pageSize);
+
+    const isNext = totalQuestions > skipAmount + recommendQuestions.length;
+
+    return { questions: recommendQuestions, isNext }
+  } catch (error) {
+    console.log("Error getting recommended questions:", error);
+    throw error;
+  }
+}
+
+// export async function getAllUsers(params: GetAllUsersParams) {
+//   try {
+//     connectToDatabase();
+
+//   } catch (error) {
+//     console.log(error);
+//     throw error;
+//   }
+// }

@@ -1,19 +1,31 @@
 import QuestionCard from '@/components/cards/QuestionCard'
 import Filter from '@/components/shared/Filter'
 import NoResult from '@/components/shared/NoResult'
+import Pagination from '@/components/shared/Pagination'
 import LocalSearchbar from '@/components/shared/search/LocalSearchbar'
 import { QuestionFilters } from '@/constants/filter'
 import { getSavedQuestions } from '@/lib/actions/user.action'
+import { SearchParamsProps } from '@/types'
 import { auth } from '@clerk/nextjs/server'
 import React from 'react'
 
-const Page = async () => {
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Collection | Dev Overflow',
+}
+
+
+const Page = async ({ searchParams }: SearchParamsProps) => {
   const { userId } = await auth();
 
   if(!userId) return null;
 
   const result = await getSavedQuestions({
     clerkId: userId,
+    searchQuery: searchParams.q,
+    filter: searchParams.filter,
+    page: searchParams.page ? + searchParams.page : 1,
   });
 
   return (
@@ -58,6 +70,13 @@ const Page = async () => {
             linkTitle="Ask a Question"
           />
         }
+      </div>
+
+      <div className="mt-10">
+        <Pagination
+          pageNumber={searchParams?.page ? +searchParams.page : 1}
+          isNext={result.isNext}
+        />
       </div>
     </>
 

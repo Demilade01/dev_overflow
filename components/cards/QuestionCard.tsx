@@ -11,7 +11,7 @@ interface Props {
   _id: string;
   title: string;
   tags: { _id: string, name: string }[];
-  author:  { _id: string, name: string, picture: string };
+  author:  { _id: string, name: string, picture: string, clerkId: string };
   upvotes: string[];
   views: number;
   answers: Array<object>;
@@ -67,32 +67,35 @@ const QuestionCard = ({
           imgUrl={author.picture}
           alt="user"
           value={author.name}
-          title={` - asked ${getTimestamp(createdAt)}`}
+          title={` | asked ${getTimestamp(createdAt)}`}
           href={`/profile/${author._id}`}
           isAuthor
           textStyles="body-medium px-2 text-dark400_light700"
         />
-        <Metric
-          imgUrl="/assets/icons/like.svg"
-          alt="Upvotes"
-          value={formatLargeNumber(upvotes.length)}
-          title="Votes"
-          textStyles="small-medium text-dark400_light800"
-        />
-        <Metric
-          imgUrl="/assets/icons/message.svg"
-          alt="Upvotes"
-          value={formatLargeNumber(answers.length)}
-          title="Answers"
-          textStyles="small-medium text-dark400_light800"
-        />
-        <Metric
-          imgUrl="/assets/icons/eye.svg"
-          alt="eye"
-          value={formatLargeNumber(views)}
-          title="Views"
-          textStyles="small-medium text-dark400_light800"
-        />
+
+        <div className='flex items-center gap-3 max-sm:flex-wrap max-sm:justify-start'>
+          <Metric
+            imgUrl="/assets/icons/like.svg"
+            alt="Upvotes"
+            value={formatLargeNumber(upvotes.length)}
+            title="Votes"
+            textStyles="small-medium text-dark400_light800"
+          />
+          <Metric
+            imgUrl="/assets/icons/message.svg"
+            alt="Upvotes"
+            value={formatLargeNumber(answers.length)}
+            title="Answers"
+            textStyles="small-medium text-dark400_light800"
+          />
+          <Metric
+            imgUrl="/assets/icons/eye.svg"
+            alt="eye"
+            value={formatLargeNumber(views)}
+            title="Views"
+            textStyles="small-medium text-dark400_light800"
+          />
+        </div>
       </div>
     </div>
   )

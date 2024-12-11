@@ -9,13 +9,15 @@ import Votes from "@/components/shared/Votes";
 import { getTimestamp } from "@/lib/utils";
 import { AnswerFilters } from "@/constants/filter";
 import { getAnswer } from "@/lib/actions/answer.action";
+import Pagination from "./Pagination";
+import EditDeleteAction from "./EditDeleteAction";
 
 interface Props {
   questionId: string;
   userId: string;
   totalAnswers: number;
   page?: number;
-  filter?: number;
+  filter?: string;
 }
 
 const AllAnswers = async ({
@@ -27,6 +29,8 @@ const AllAnswers = async ({
 }: Props) => {
   const result = await getAnswer({
     questionId,
+    page: page ? +page: 1,
+    sortBy: filter,
   });
 
   return (
@@ -42,7 +46,6 @@ const AllAnswers = async ({
 
           return (
             <article key={answer._id} className="light-border border-b py-10">
-              <div className="mb-8 flex flex-col-reverse justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
                 <Link
                   href={`/profile/${answer.author.clerkId}`}
                   className="flex flex-1 items-start gap-1 sm:items-center"
@@ -75,27 +78,29 @@ const AllAnswers = async ({
                     hasdownVoted={answer.downvotes.includes(userId)}
                   />
                 </div>
-              </div>
               <ParseHTML data={answer.content} />
 
-              {/* <SignedIn>
+              <SignedIn>
                 {showActionButtons && (
                   <EditDeleteAction
                     type="Answer"
                     itemId={JSON.stringify(answer._id)}
                   />
                 )}
-              </SignedIn> */}
+              </SignedIn>
             </article>
           );
         })}
       </div>
 
       <div className="mt-10 w-full">
-        {/* <Pagination pageNumber={page ? +page : 1} isNext={result.isNext} /> */}
+        <Pagination
+          pageNumber={ page ? +page: 1}
+          isNext={result.isNextAnswer}
+        />
       </div>
     </div>
-  );
+  )
 };
 
 export default AllAnswers;
