@@ -7,7 +7,7 @@ import { QuestionFilters } from '@/constants/filter'
 import { getSavedQuestions } from '@/lib/actions/user.action'
 import { SearchParamsProps } from '@/types'
 import { auth } from '@clerk/nextjs/server'
-import React, { Suspense } from 'react'
+import React from 'react'
 
 import type { Metadata } from 'next'
 
@@ -33,7 +33,6 @@ const Page = async ({ searchParams }: SearchParamsProps) => {
       <h1 className='h1-bold text-dark100_light900'>Saved Questions</h1>
 
       <div className='mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center'>
-        <Suspense>
           <LocalSearchbar
             route='/'
             iconPosition='left'
@@ -46,7 +45,6 @@ const Page = async ({ searchParams }: SearchParamsProps) => {
             filters={QuestionFilters}
             otherClasses="min-h-[56px] sm:min-w-[170px]"
           />
-        </Suspense>
       </div>
 
       <div className='mt-10 flex w-full flex-col gap-6'>
@@ -75,12 +73,10 @@ const Page = async ({ searchParams }: SearchParamsProps) => {
       </div>
 
       <div className="mt-10">
-        <Suspense>
           <Pagination
             pageNumber={searchParams?.page ? +searchParams.page : 1}
             isNext={result.isNext}
           />
-        </Suspense>
       </div>
     </>
 

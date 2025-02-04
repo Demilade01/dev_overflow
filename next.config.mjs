@@ -10,6 +10,7 @@ const nextConfig = {
     mdxRs: true,
     serverComponentsExternalPackages: ['mongoose'],
     esmExternals: 'loose',
+    missingSuspenseWithCSRBailout: false,
   },
   images: {
     remotePatterns: [

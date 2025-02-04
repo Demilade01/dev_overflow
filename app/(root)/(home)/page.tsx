@@ -9,7 +9,6 @@ import { HomePageFilters } from '@/constants/filter'
 import { getQuestions, getRecommendedQuestions } from '@/lib/actions/question.action'
 import { SearchParamsProps } from '@/types'
 import Link from 'next/link'
-import React, { Suspense } from 'react'
 
 import type { Metadata } from 'next'
 import { auth } from '@clerk/nextjs/server'
@@ -60,7 +59,6 @@ const Home = async ({ searchParams }: SearchParamsProps) => {
           </Link>
       </div>
       <div className='mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center'>
-        <Suspense>
           <LocalSearchbar
             route='/'
             iconPosition='left'
@@ -74,11 +72,8 @@ const Home = async ({ searchParams }: SearchParamsProps) => {
             otherClasses="min-h-[56px] sm:min-w-[170px]"
             containerClasses="hidden max-md:flex"
           />
-        </Suspense>
       </div>
-        <Suspense>
           <HomeFilter />
-        </Suspense>
 
       <div className='mt-10 flex w-full flex-col gap-6'>
         {/* looping through questions */}

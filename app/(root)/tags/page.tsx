@@ -6,7 +6,6 @@ import { TagFilters } from '@/constants/filter'
 import { getAllTags } from '@/lib/actions/tag.actions'
 import { SearchParamsProps } from '@/types'
 import Link from 'next/link'
-import React, { Suspense } from 'react'
 
 const Page = async ({ searchParams }: SearchParamsProps) => {
   const result = await getAllTags({
@@ -20,7 +19,6 @@ const Page = async ({ searchParams }: SearchParamsProps) => {
     <>
       <h1 className='h1-bold text-dark100_light900'>Tags</h1>
       <div className='mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center'>
-      <Suspense>
         <LocalSearchbar
           route='/tags'
           iconPosition='left'
@@ -33,7 +31,6 @@ const Page = async ({ searchParams }: SearchParamsProps) => {
           filters={TagFilters}
           otherClasses="min-h-[56px] sm:min-w-[170px]"
         />
-      </Suspense>
       </div>
 
       <section className='mt-12 flex flex-wrap gap-4'>
@@ -62,12 +59,10 @@ const Page = async ({ searchParams }: SearchParamsProps) => {
         )}
       </section>
       <div className="mt-10">
-      <Suspense>
         <Pagination
           pageNumber={searchParams?.page ? +searchParams.page : 1}
           isNext={result.isNext}
         />
-      </Suspense>
       </div>
     </>
   )

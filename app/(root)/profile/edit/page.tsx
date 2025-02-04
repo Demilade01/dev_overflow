@@ -3,7 +3,7 @@ import { getQuestionById } from '@/lib/actions/question.action';
 import { getUserById } from '@/lib/actions/user.action';
 import { ParamsProps } from '@/types';
 import { auth } from '@clerk/nextjs/server'
-import React, { Suspense } from 'react'
+import React from 'react'
 
 const Page = async ({ params }: ParamsProps) => {
   const { userId } = await auth();
@@ -17,12 +17,10 @@ const Page = async ({ params }: ParamsProps) => {
       <h1 className='h1-bold text-dark100_light900'>Edit Profile</h1>
 
       <div className='mt-9'>
-      <Suspense>
         <Profile
           clerkId={userId}
           user={JSON.stringify(mongoUser)}
         />
-      </Suspense>
       </div>
     </>
   )
