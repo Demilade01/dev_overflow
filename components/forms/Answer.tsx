@@ -65,7 +65,7 @@ const Answer = ({ question, questionId, authorId }: Props) => {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/openai`, // Fixed URL
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/chatgpt`, // Fixed URL
         {
           method: "POST",
           headers: {
